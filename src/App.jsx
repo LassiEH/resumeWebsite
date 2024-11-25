@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Header = () => {
   return (
@@ -28,7 +28,8 @@ const Skills = () => {
     { name: "Python", level: "Advanced"},
     { name: "Javascript", level: "Intermediate"},
     { name: "Linux", level: "Advanced"},
-    { name: "Version control", level: "Advanced"}
+    { name: "Version control", level: "Advanced"},
+    { name: "Azure", level: "Intermediate"}
   ]
   return (
     <section style={{ padding: "20px"}}>
@@ -76,6 +77,47 @@ const Experience = () => {
   );
 };
 
+const VisitCounter = () => {
+  const [count, setCount] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchVisitCount = async () => {
+      try {
+        const functionApiUrl = 'https://counter-web-func.azurewebsites.net/api/AzureCounterFunction?';
+        const response = await fetch(functionApiUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setCount(data.count);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVisitCount();
+  }, []);
+
+  if (loading) {
+    return <p>Loading visit count...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  return (
+    <section style={{ padding: "20px" }}>
+      <h2>Visit Counter</h2>
+      <p>Current visit count: {count}</p>
+    </section>
+  );
+};
+
 const App = () => {
   return (
     <div>
@@ -83,6 +125,7 @@ const App = () => {
       <About />
       <Skills />
       <Experience />
+      <VisitCounter />
     </div>
   );
 };
